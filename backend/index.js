@@ -12,7 +12,7 @@ import reviewRouter from "./routes/reviewRoute.js"
 dotenv.config()
 
 let port = process.env.PORT
-let app = express()
+let app = express() 
 app.use(express.json())
 app.use(cookieParser())
 app.use(cors({
