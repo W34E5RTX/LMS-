@@ -1,49 +1,50 @@
-import mongoose from "mongoose";
-const userSchema = new mongoose.Schema(
-  {
-    name: {
-      type: String,
-      required: true
-    },
-    email: {
-      type: String,
-      required: true,
-      unique: true
-    },
-    password: {
-      type: String
-      
-    },
-    description: {
-      type: String
-    },
-    role: {
-      type: String,
-      enum: ["educator", "student"],
-      required: true
-    },
-    photoUrl: {
-      type: String,
-      default: ""
-    },
-    enrolledCourses: [{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Course'
-    }],
-    resetOtp:{
-      type:String
-    },
-    otpExpires:{
-      type:Date
-    },
-    isOtpVerifed:{
-      type:Boolean,
-      default:false
-    }
-    
-  },
-  { timestamps: true }
-);
+import { DataTypes } from 'sequelize';
+import { sequelize } from '../configs/db.js';
 
-const User = mongoose.model("User", userSchema);
+const User = sequelize.define('User', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  email: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true,
+  },
+  password: {
+    type: DataTypes.STRING,
+  },
+  description: {
+    type: DataTypes.TEXT,
+  },
+  role: {
+    type: DataTypes.ENUM('educator', 'student'),
+    allowNull: false,
+  },
+  photoUrl: {
+    type: DataTypes.STRING,
+    defaultValue: '',
+  },
+  enrolledCourses: {
+    type: DataTypes.JSON, // or use association
+  },
+  resetOtp: {
+    type: DataTypes.STRING,
+  },
+  otpExpires: {
+    type: DataTypes.DATE,
+  },
+  isOtpVerified: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+  },
+}, {
+  timestamps: true,
+});
+
 export default User;

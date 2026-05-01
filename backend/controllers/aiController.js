@@ -1,5 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
+import { Op } from "sequelize";
 import Course from "../models/courseModel.js";
 dotenv.config();
 
@@ -42,31 +43,35 @@ Query: ${input}
 
 
 
-    const courses = await Course.find({
-      isPublished: true,
-     $or: [
-    { title: { $regex: input, $options: 'i' } },
-    { subTitle: { $regex: input, $options: 'i' } },
-    { description: { $regex: input, $options: 'i' } },
-    { category: { $regex: input, $options: 'i' } },
-    { level: { $regex: input, $options: 'i' } }
-  ]
+    const courses = await Course.findAll({
+      where: {
+        isPublished: true,
+        [Op.or]: [
+          { title: { [Op.iLike]: `%${input}%` } },
+          { subTitle: { [Op.iLike]: `%${input}%` } },
+          { description: { [Op.iLike]: `%${input}%` } },
+          { category: { [Op.iLike]: `%${input}%` } },
+          { level: { [Op.iLike]: `%${input}%` } },
+        ],
+      },
     });
 
-    if(courses.length>0){
-    return res.status(200).json(courses);
-    }else{
-       const courses = await Course.find({
-      isPublished: true,
-     $or: [
-    { title: { $regex: keyword, $options: 'i' } },
-    { subTitle: { $regex: keyword, $options: 'i' } },
-    { description: { $regex: keyword, $options: 'i' } },
-    { category: { $regex: keyword, $options: 'i' } },
-    { level: { $regex: keyword, $options: 'i' } }
-  ]
-    });
-       return res.status(200).json(courses);
+    if(courses.length > 0) {
+      return res.status(200).json(courses);
+    } else {
+      const courses = await Course.findAll({
+        where: {
+          isPublished: true,
+          [Op.or]: [
+            { title: { [Op.iLike]: `%${keyword}%` } },
+            { subTitle: { [Op.iLike]: `%${keyword}%` } },
+            { description: { [Op.iLike]: `%${keyword}%` } },
+            { category: { [Op.iLike]: `%${keyword}%` } },
+            { level: { [Op.iLike]: `%${keyword}%` } },
+          ],
+        },
+      });
+      return res.status(200).json(courses);
     }
 
 

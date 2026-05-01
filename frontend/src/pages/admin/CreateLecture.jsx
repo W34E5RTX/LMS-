@@ -37,23 +37,16 @@ function CreateLecture() {
       const getLecture = async () => {
         try {
           const result = await axios.get(serverUrl + `/api/course/getcourselecture/${courseId}`,{withCredentials:true})
-        console.log(result.data)
-        dispatch(setLectureData(result.data.lectures))
-        
-
-          
+          console.log(result.data)
+          dispatch(setLectureData(result.data.lectures || []))
         } catch (error) {
            console.log(error)
-        toast.error(error.response.data.message)
-        
+           toast.error(error.response?.data?.message || "Failed to load lectures")
         }
-        
       }
       getLecture()
-    },[])
+    },[courseId, dispatch])
 
-   
-  
   return (
      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="bg-white shadow-xl rounded-xl w-full max-w-2xl p-6">
@@ -88,7 +81,7 @@ function CreateLecture() {
           {lectureData.map((lecture, index) => (
             <div key={index} className="bg-gray-100 rounded-md flex justify-between items-center p-3 text-sm font-medium text-gray-700">
               <span>Lecture - {index + 1}: {lecture.lectureTitle}</span>
-              <FaEdit className="text-gray-500 hover:text-gray-700 cursor-pointer"  onClick={()=>navigate(`/editlecture/${courseId}/${lecture._id}`)}/>
+              <FaEdit className="text-gray-500 hover:text-gray-700 cursor-pointer"  onClick={()=>navigate(`/editlecture/${courseId}/${lecture.id}`)}/>
             </div>
           ))}
         </div> 

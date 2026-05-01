@@ -87,7 +87,7 @@ function Courses() {
                     </span>
                   </td>
                   <td className="py-3 px-4">
-                    <FaEdit className="text-gray-600 hover:text-blue-600 cursor-pointer" onClick={() => navigate(`/addcourses/${course?._id}`)} />
+                    <FaEdit className="text-gray-600 hover:text-blue-600 cursor-pointer" onClick={() => navigate(`/addcourses/${course?.id}`)} />
                   </td>
                 </tr>
               ))

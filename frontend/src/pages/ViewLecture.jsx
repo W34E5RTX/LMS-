@@ -8,13 +8,13 @@ function ViewLecture() {
   const { courseId } = useParams();
   const { courseData } = useSelector((state) => state.course);
   const {userData} = useSelector((state) => state.user)
-  const selectedCourse = courseData?.find((course) => course._id === courseId);
+  const selectedCourse = courseData?.find((course) => course.id === courseId);
 
   const [selectedLecture, setSelectedLecture] = useState(
     selectedCourse?.lectures?.[0] || null
   );
   const navigate = useNavigate()
-  const courseCreator = userData?._id === selectedCourse?.creator ? userData : null;
+  const courseCreator = userData?.id === selectedCourse?.creator ? userData : null;
 
 
   return (
@@ -66,7 +66,7 @@ function ViewLecture() {
                 key={index}
                 onClick={() => setSelectedLecture(lecture)}
                 className={`flex items-center justify-between p-3 rounded-lg border transition text-left ${
-                  selectedLecture?._id === lecture._id
+                  selectedLecture?.id === lecture.id
                     ? 'bg-gray-200 border-gray-500'
                     : 'hover:bg-gray-50 border-gray-300'
                 }`}

@@ -90,14 +90,14 @@ const editCourseHandler = async () => {
     const updatedCourse = result.data;
     if (updatedCourse.isPublished) {
       const updatedCourses = courseData.map(c =>
-        c._id === courseId ? updatedCourse : c
+        c.id === courseId ? updatedCourse : c
       );
-      if (!courseData.some(c => c._id === courseId)) {
+      if (!courseData.some(c => c.id === courseId)) {
         updatedCourses.push(updatedCourse);
       }
       dispatch(setCourseData(updatedCourses));
     } else {
-      const filteredCourses = courseData.filter(c => c._id !== courseId);
+      const filteredCourses = courseData.filter(c => c.id !== courseId);
       dispatch(setCourseData(filteredCourses));
     }
 
@@ -117,7 +117,7 @@ const editCourseHandler = async () => {
     try {
       const result = await axios.delete(serverUrl + `/api/course/removecourse/${courseId}` , {withCredentials:true})
       toast.success("Course Deleted")
-       const filteredCourses = courseData.filter(c => c._id !== courseId);
+       const filteredCourses = courseData.filter(c => c.id !== courseId);
       dispatch(setCourseData(filteredCourses));
       console.log(result)
       navigate("/courses")
@@ -139,7 +139,7 @@ const editCourseHandler = async () => {
         <FaArrowLeftLong  className='top-[-20%] md:top-[20%] absolute left-[0] md:left-[2%] w-[22px] h-[22px] cursor-pointer' onClick={()=>navigate("/courses")}/>
         <h2 className="text-2xl font-semibold md:pl-[60px]">Add detail information regarding course</h2>
         <div className="space-x-2 space-y-2 ">
-          <button className="bg-black text-white px-4 py-2 rounded-md" onClick={()=>navigate(`/createlecture/${selectedCourse?._id}`)}>Go to lectures page</button>
+          <button className="bg-black text-white px-4 py-2 rounded-md" onClick={()=>navigate(`/createlecture/${selectedCourse?.id}`)}>Go to lectures page</button>
           
         </div>
       </div>

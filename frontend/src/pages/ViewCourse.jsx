@@ -62,7 +62,7 @@ console.log("Average Rating:", avgRating);
 
   const fetchCourseData = async () => {
     courseData.map((item) => {
-      if (item._id === courseId) {
+      if (item.id === courseId) {
       dispatch(setSelectedCourseData(item))
         console.log(selectedCourseData)
       
@@ -75,7 +75,7 @@ console.log("Average Rating:", avgRating);
   }
     const checkEnrollment = () => {
   const verify = userData?.enrolledCourses?.some(c => {
-    const enrolledId = typeof c === 'string' ? c : c._id;
+    const enrolledId = typeof c === 'string' ? c : c.id;
     return enrolledId?.toString() === courseId?.toString();
   });
 
@@ -118,10 +118,10 @@ console.log("Average Rating:", avgRating);
 
 
   useEffect(() => {
-  if (creatorData?._id && courseData.length > 0) {
+  if (creatorData?.id && courseData.length > 0) {
     const creatorCourses = courseData.filter(
       (course) =>
-        course.creator === creatorData._id && course._id !== courseId // Exclude current course
+        course.creator === creatorData.id && course.id !== courseId // Exclude current course
     );
     setSelectedCreatorCourse(creatorCourses);
   
@@ -217,7 +217,7 @@ setIsEnrolled(true)
             </ul>
 
             {/* Enroll Button */}
-            {!isEnrolled ?<button className="bg-[black] text-white px-6 py-2 rounded hover:bg-gray-700 mt-3" onClick={()=>handleEnroll(courseId , userData._id)}>
+            {!isEnrolled ?<button className="bg-[black] text-white px-6 py-2 rounded hover:bg-gray-700 mt-3" onClick={()=>handleEnroll(courseId , userData.id)}>
               Enroll Now
             </button> :
             <button className="bg-green-200 text-green-600 px-6 py-2 rounded hover:bg-gray-100 hover:border mt-3" onClick={()=>navigate(`/viewlecture/${courseId}`)}>
@@ -361,7 +361,7 @@ setIsEnrolled(true)
           
             {
                 selectedCreatorCourse?.map((item,index)=>(
-                    <Card key={index} thumbnail={item.thumbnail} title={item.title} id={item._id} price={item.price} category={item.category}/>
+                    <Card key={index} thumbnail={item.thumbnail} title={item.title} id={item.id} price={item.price} category={item.category}/>
                 ))
             }
         </div>

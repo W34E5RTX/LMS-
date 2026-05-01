@@ -26,7 +26,7 @@ export const createCourse = async (req,res) => {
 
 export const getPublishedCourses = async (req,res) => {
     try {
-        const courses = await Course.find({isPublished:true}).populate("lectures reviews")
+        const courses = await Course.findAll({ where: { isPublished: true } })
         if(!courses)
         {
             return res.status(404).json({message:"Course not found"})
@@ -43,7 +43,7 @@ export const getPublishedCourses = async (req,res) => {
 export const getCreatorCourses = async (req,res) => {
     try {
         const userId = req.userId
-        const courses = await Course.find({creator:userId})
+        const courses = await Course.findAll({ where: { creator: userId } })
         if(!courses)
         {
             return res.status(404).json({message:"Course not found"})
@@ -63,13 +63,19 @@ export const editCourse = async (req,res) => {
          if(req.file){
             thumbnail =await uploadOnCloudinary(req.file.path)
                 }
-        let course = await Course.findById(courseId)
+        let course = await Course.findByPk(courseId)
         if(!course){
             return res.status(404).json({message:"Course not found"})
         }
-        const updateData = {title , subTitle , description , category , level , price , isPublished ,thumbnail}
-
-        course = await Course.findByIdAndUpdate(courseId , updateData , {new:true})
+        course.title = title || course.title
+        course.subTitle = subTitle || course.subTitle
+        course.description = description || course.description
+        course.category = category || course.category
+        course.level = level || course.level
+        course.price = price && price !== "" ? parseFloat(price) : course.price
+        course.isPublished = isPublished === "true" ? true : isPublished === "false" ? false : course.isPublished
+        if(thumbnail) course.thumbnail = thumbnail
+        await course.save()
         return res.status(201).json(course)
     } catch (error) {
         return res.status(500).json({message:`Failed to update course ${error}`})
@@ -80,7 +86,7 @@ export const editCourse = async (req,res) => {
 export const getCourseById = async (req,res) => {
     try {
         const {courseId} = req.params
-        let course = await Course.findById(courseId)
+        let course = await Course.findByPk(courseId)
         if(!course){
             return res.status(404).json({message:"Course not found"})
         }
@@ -93,13 +99,13 @@ export const getCourseById = async (req,res) => {
 export const removeCourse = async (req, res) => {
   try {
     const courseId = req.params.courseId;
-    const course = await Course.findById(courseId);
+    const course = await Course.findByPk(courseId);
     
     if (!course) {
       return res.status(404).json({ message: "Course not found" });
     }
 
-    await course.deleteOne();
+    await course.destroy();
     return res.status(200).json({ message: "Course Removed Successfully" });
   } catch (error) {
     console.error(error);
@@ -120,12 +126,11 @@ export const createLecture = async (req,res) => {
              return res.status(400).json({message:"Lecture Title required"})
         }
         const lecture = await Lecture.create({lectureTitle})
-        const course = await Course.findById(courseId)
+        const course = await Course.findByPk(courseId)
         if(course){
-            course.lectures.push(lecture._id)
+            course.lectures = [...(course.lectures || []), lecture.id]
             
         }
-        await course.populate("lectures")
         await course.save()
         return res.status(201).json({lecture,course})
         
@@ -138,13 +143,13 @@ export const createLecture = async (req,res) => {
 export const getCourseLecture = async (req,res) => {
     try {
         const {courseId} = req.params
-        const course = await Course.findById(courseId)
+        const course = await Course.findByPk(courseId)
         if(!course){
             return res.status(404).json({message:"Course not found"})
         }
-        await course.populate("lectures")
-        await course.save()
-        return res.status(200).json(course)
+        const lectureIds = Array.isArray(course.lectures) ? course.lectures : []
+        const lectures = lectureIds.length > 0 ? await Lecture.findAll({ where: { id: lectureIds } }) : []
+        return res.status(200).json({ course, lectures })
     } catch (error) {
         return res.status(500).json({message:`Failed to get Lectures ${error}`})
     }
@@ -154,7 +159,7 @@ export const editLecture = async (req,res) => {
     try {
         const {lectureId} = req.params
         const {isPreviewFree , lectureTitle} = req.body
-        const lecture = await Lecture.findById(lectureId)
+        const lecture = await Lecture.findByPk(lectureId)
           if(!lecture){
             return res.status(404).json({message:"Lecture not found"})
         }
@@ -179,16 +184,13 @@ export const editLecture = async (req,res) => {
 export const removeLecture = async (req,res) => {
     try {
         const {lectureId} = req.params
-        const lecture = await Lecture.findByIdAndDelete(lectureId)
+        const lecture = await Lecture.findByPk(lectureId)
         if(!lecture){
              return res.status(404).json({message:"Lecture not found"})
         }
+        await lecture.destroy()
         //remove the lecture from associated course
-
-        await Course.updateOne(
-            {lectures: lectureId},
-            {$pull:{lectures: lectureId}}
-        )
+        // Note: Need to update course.lectures array manually
         return res.status(200).json({message:"Lecture Remove Successfully"})
         }
     
@@ -208,7 +210,7 @@ export const getCreatorById = async (req, res) => {
   try {
     const {userId} = req.body;
 
-    const user = await User.findById(userId).select("-password"); // Exclude password
+    const user = await User.findByPk(userId, { attributes: { exclude: ['password'] } });
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });

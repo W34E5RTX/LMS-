@@ -111,7 +111,7 @@ function SearchWithAi() {
               <div
                 key={index}
                 className="bg-white text-black p-5 rounded-2xl shadow-md hover:shadow-indigo-500/30 transition-all duration-200 border border-gray-200 cursor-pointer hover:bg-gray-200"
-                onClick={() => navigate(`/viewcourse/${course._id}`)}
+                onClick={() => navigate(`/viewcourse/${course.id}`)}
               >
                 <h3 className="text-lg font-bold sm:text-xl">{course.title}</h3>
                 <p className="text-sm text-gray-600 mt-1">{course.category}</p>

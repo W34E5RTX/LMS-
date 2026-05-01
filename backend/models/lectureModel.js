@@ -1,20 +1,24 @@
-import mongoose from "mongoose";
+import { DataTypes } from 'sequelize';
+import { sequelize } from '../configs/db.js';
 
-const lectureSchema = new mongoose.Schema({
-    lectureTitle:{
-        type:String,
-        required:true
-    },
-    videoUrl:{
-        type:String
-    },
-    isPreviewFree:{
-        type:Boolean
-    },
-    
-},{timestamps:true})
+const Lecture = sequelize.define('Lecture', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  lectureTitle: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  videoUrl: {
+    type: DataTypes.STRING,
+  },
+  isPreviewFree: {
+    type: DataTypes.BOOLEAN,
+  },
+}, {
+  timestamps: true,
+});
 
-
-const Lecture = mongoose.model("Lecture" , lectureSchema)
-
-export default Lecture
+export default Lecture;

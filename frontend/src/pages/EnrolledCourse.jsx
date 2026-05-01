@@ -29,7 +29,7 @@ function EnrolledCourse() {
         <div className="flex items-center justify-center flex-wrap gap-[30px]">
           {userData.enrolledCourses.map((course) => (
             <div
-              key={course._id}
+              key={course.id}
               className="bg-white rounded-2xl shadow-md overflow-hidden border"
             >
               <img
@@ -41,7 +41,7 @@ function EnrolledCourse() {
                 <h2 className="text-lg font-semibold text-gray-800">{course.title}</h2>
                 <p className="text-sm text-gray-600 mb-2">{course.category}</p>
                 <p className="text-sm text-gray-700">{course.level}</p>
-                <h1 className='px-[10px] text-center  py-[10px] border-2  bg-black border-black text-white  rounded-[10px] text-[15px] font-light flex items-center justify-center gap-2 cursor-pointer mt-[10px] hover:bg-gray-600' onClick={()=>navigate(`/viewlecture/${course._id}`)}>Watch Now</h1>
+                <h1 className='px-[10px] text-center  py-[10px] border-2  bg-black border-black text-white  rounded-[10px] text-[15px] font-light flex items-center justify-center gap-2 cursor-pointer mt-[10px] hover:bg-gray-600' onClick={()=>navigate(`/viewlecture/${course.id}`)}>Watch Now</h1>
               </div>
             </div>
           ))}

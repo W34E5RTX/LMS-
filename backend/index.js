@@ -1,6 +1,6 @@
 import express from "express"
 import dotenv from "dotenv"
-import connectDb from "./configs/db.js"
+import connectDb, { sequelize } from "./configs/db.js"
 import authRouter from "./routes/authRoute.js"
 import cookieParser from "cookie-parser"
 import cors from "cors"
@@ -9,6 +9,11 @@ import courseRouter from "./routes/courseRoute.js"
 import paymentRouter from "./routes/paymentRoute.js"
 import aiRouter from "./routes/aiRoute.js"
 import reviewRouter from "./routes/reviewRoute.js"
+// import './models/userModel.js'
+// import './models/courseModel.js'
+// import './models/lectureModel.js'
+// import './models/orderModel.js'
+// import './models/reviewModel.js'
 dotenv.config()
 
 let port = process.env.PORT
@@ -31,8 +36,9 @@ app.get("/" , (req,res)=>{
     res.send("Hello From Server")
 })
 
-app.listen(port , ()=>{
+app.listen(port , async ()=>{
     console.log("Server Started")
-    connectDb()
+    await connectDb()
+    await sequelize.sync()
 })
 

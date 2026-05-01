@@ -13,7 +13,7 @@ function EditLecture() {
     const {courseId , lectureId} = useParams()
     const {lectureData} = useSelector(state=>state.lecture)
     const dispatch = useDispatch()
-    const selectedLecture = lectureData.find(lecture => lecture._id === lectureId)
+    const selectedLecture = lectureData.find(lecture => lecture.id === lectureId)
     const [videoUrl,setVideoUrl] = useState(null)
     const [lectureTitle,setLectureTitle] = useState(selectedLecture.lectureTitle)
     const [isPreviewFree,setIsPreviewFree] = useState(false)

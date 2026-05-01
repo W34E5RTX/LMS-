@@ -26,7 +26,7 @@ import ViewLecture from './pages/ViewLecture'
 import SearchWithAi from './pages/SearchWithAi'
 import getAllReviews from './customHooks/getAllReviews'
 
-export const serverUrl = "https://lms-iota-opal.vercel.app/"
+export const serverUrl = import.meta.env.VITE_SERVER_URL || "http://localhost:8000"
 
 function App() {
   
@@ -36,6 +36,20 @@ function App() {
   getCouseData()
   getCreatorCourseData()
   getAllReviews()
+
+  const renderUserRoute = (element) => {
+    if (userData === undefined) {
+      return <div className="min-h-screen flex items-center justify-center">Loading...</div>
+    }
+    return userData ? element : <Navigate to={'/signup'} />
+  }
+
+  const renderEducatorRoute = (element) => {
+    if (userData === undefined) {
+      return <div className="min-h-screen flex items-center justify-center">Loading...</div>
+    }
+    return userData?.role === 'educator' ? element : <Navigate to={'/signup'} />
+  }
   return (
     <>
     
@@ -45,21 +59,21 @@ function App() {
         <Route path='/' element={<Home/>}/>
         <Route path='/login' element={<Login/>}/>
         <Route path='/signup' element={!userData?<SignUp/>:<Navigate to={"/"}/>}/>
-        <Route path='/profile' element={userData?<Profile/>:<Navigate to={"/signup"}/>}/>
-        <Route path='/allcourses' element={userData?<AllCouses/>:<Navigate to={"/signup"}/>}/>
-        <Route path='/viewcourse/:courseId' element={userData?<ViewCourse/>:<Navigate to={"/signup"}/>}/>
-        <Route path='/editprofile' element={userData?<EditProfile/>:<Navigate to={"/signup"}/>}/>
-        <Route path='/enrolledcourses' element={userData?<EnrolledCourse/>:<Navigate to={"/signup"}/>}/>
-         <Route path='/viewlecture/:courseId' element={userData?<ViewLecture/>:<Navigate to={"/signup"}/>}/>
-         <Route path='/searchwithai' element={userData?<SearchWithAi/>:<Navigate to={"/signup"}/>}/>
+        <Route path='/profile' element={renderUserRoute(<Profile/>)} />
+        <Route path='/allcourses' element={renderUserRoute(<AllCouses/>)} />
+        <Route path='/viewcourse/:courseId' element={renderUserRoute(<ViewCourse/>)} />
+        <Route path='/editprofile' element={renderUserRoute(<EditProfile/>)} />
+        <Route path='/enrolledcourses' element={renderUserRoute(<EnrolledCourse/>)} />
+         <Route path='/viewlecture/:courseId' element={renderUserRoute(<ViewLecture/>)} />
+         <Route path='/searchwithai' element={renderUserRoute(<SearchWithAi/>)} />
         
         
-        <Route path='/dashboard' element={userData?.role === "educator"?<Dashboard/>:<Navigate to={"/signup"}/>}/>
-        <Route path='/courses' element={userData?.role === "educator"?<Courses/>:<Navigate to={"/signup"}/>}/>
-        <Route path='/addcourses/:courseId' element={userData?.role === "educator"?<AddCourses/>:<Navigate to={"/signup"}/>}/>
-        <Route path='/createcourses' element={userData?.role === "educator"?<CreateCourse/>:<Navigate to={"/signup"}/>}/>
-        <Route path='/createlecture/:courseId' element={userData?.role === "educator"?<CreateLecture/>:<Navigate to={"/signup"}/>}/>
-        <Route path='/editlecture/:courseId/:lectureId' element={userData?.role === "educator"?<EditLecture/>:<Navigate to={"/signup"}/>}/>
+        <Route path='/dashboard' element={renderEducatorRoute(<Dashboard/>)} />
+        <Route path='/courses' element={renderEducatorRoute(<Courses/>)} />
+        <Route path='/addcourses/:courseId' element={renderEducatorRoute(<AddCourses/>)} />
+        <Route path='/createcourses' element={renderEducatorRoute(<CreateCourse/>)} />
+        <Route path='/createlecture/:courseId' element={renderEducatorRoute(<CreateLecture/>)} />
+        <Route path='/editlecture/:courseId/:lectureId' element={renderEducatorRoute(<EditLecture/>)} />
         <Route path='/forgotpassword' element={<ForgotPassword/>}/>
          </Routes>
 

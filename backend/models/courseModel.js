@@ -1,52 +1,53 @@
-import mongoose from "mongoose"
+import { DataTypes } from 'sequelize';
+import { sequelize } from '../configs/db.js';
 
-const courseSchema = new mongoose.Schema({
-    title:{
-        type:String,
-        required:true
-    },
-    subTitle:{
-        type:String
-    },
-    description:{
-        type:String
-    },
-    category:{
-        type:String,
-        required:true
-    },
-    level:{
-        type:String,
-        enum:['Beginner','Intermediate','Advanced']
-    },
-    price:{
-        type:Number
-    },
-    thumbnail:{
-        type:String
-    },
-    enrolledStudents:[{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"User"
-    }],
-    lectures:[{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"Lecture"
-    }],
-    creator:{
-         type:mongoose.Schema.Types.ObjectId,
-        ref:"User"
-    },
-    isPublished:{
-     type:Boolean,
-     default:false
-    },
-    reviews: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Review'
-        }],
-},{timestamps:true})
-
-const Course = mongoose.model("Course",courseSchema)
+const Course = sequelize.define('Course', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  title: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  subTitle: {
+    type: DataTypes.STRING,
+  },
+  description: {
+    type: DataTypes.TEXT,
+  },
+  category: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  level: {
+    type: DataTypes.STRING,
+  },
+  price: {
+    type: DataTypes.FLOAT,
+  },
+  thumbnail: {
+    type: DataTypes.STRING,
+  },
+  enrolledStudents: {
+    type: DataTypes.JSON,
+  },
+  lectures: {
+    type: DataTypes.JSON,
+  },
+  creator: {
+    type: DataTypes.INTEGER,
+  },
+  isPublished: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+  },
+  reviews: {
+    type: DataTypes.JSON,
+  },
+}, {
+  timestamps: true,
+});
 
 export default Course

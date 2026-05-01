@@ -12,17 +12,17 @@ function Dashboard() {
 
   // Sample data - Replace with real API/course data
   const courseProgressData = creatorCourseData?.map(course => ({
-    name: course.title.slice(0, 10) + "...",
-    lectures: course.lectures.length || 0
+    name: course.title?.slice(0, 10) + "...",
+    lectures: Array.isArray(course.lectures) ? course.lectures.length : 0
   })) || [];
 
   const enrollData = creatorCourseData?.map(course => ({
-    name: course.title.slice(0, 10) + "...",
-    enrolled: course.enrolledStudents?.length || 0
+    name: course.title?.slice(0, 10) + "...",
+    enrolled: Array.isArray(course.enrolledStudents) ? course.enrolledStudents.length : 0
   })) || [];
 
   const totalEarnings = creatorCourseData?.reduce((sum, course) => {
-    const studentCount = course.enrolledStudents?.length || 0;
+    const studentCount = Array.isArray(course.enrolledStudents) ? course.enrolledStudents.length : 0;
     const courseRevenue = course.price ? course.price * studentCount : 0;
     return sum + courseRevenue;
   }, 0) || 0;
