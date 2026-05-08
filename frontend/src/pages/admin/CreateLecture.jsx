@@ -18,9 +18,15 @@ function CreateLecture() {
     
 
     const createLectureHandler = async () => {
+      const title = lectureTitle.trim()
+      if (!title) {
+        toast.error("Lecture title is required")
+        return
+      }
+
       setLoading(true)
       try {
-        const result = await axios.post(serverUrl + `/api/course/createlecture/${courseId}` ,{lectureTitle} , {withCredentials:true})
+        const result = await axios.post(serverUrl + `/api/course/createlecture/${courseId}` ,{lectureTitle: title} , {withCredentials:true})
         console.log(result.data)
       dispatch(setLectureData([...lectureData,result.data.lecture]))
         toast.success("Lecture Created")
@@ -28,7 +34,7 @@ function CreateLecture() {
         setLectureTitle("")
       } catch (error) {
         console.log(error)
-        toast.error(error.response.data.message)
+        toast.error(error.response?.data?.message || "Failed to create lecture")
         setLoading(false)
       }
     }
@@ -52,7 +58,7 @@ function CreateLecture() {
       <div className="bg-white shadow-xl rounded-xl w-full max-w-2xl p-6">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-2xl font-semibold text-gray-800 mb-1">Let’s Add a Lecture</h1>
+          <h1 className="text-2xl font-semibold text-gray-800 mb-1">Let's Add a Lecture</h1>
           <p className="text-sm text-gray-500">Enter the title and add your video lectures to enhance your course content.</p>
         </div>
 
@@ -79,7 +85,7 @@ function CreateLecture() {
         {/* Lecture List */}
          <div className="space-y-2">
           {lectureData.map((lecture, index) => (
-            <div key={index} className="bg-gray-100 rounded-md flex justify-between items-center p-3 text-sm font-medium text-gray-700">
+            <div key={lecture.id} className="bg-gray-100 rounded-md flex justify-between items-center p-3 text-sm font-medium text-gray-700">
               <span>Lecture - {index + 1}: {lecture.lectureTitle}</span>
               <FaEdit className="text-gray-500 hover:text-gray-700 cursor-pointer"  onClick={()=>navigate(`/editlecture/${courseId}/${lecture.id}`)}/>
             </div>

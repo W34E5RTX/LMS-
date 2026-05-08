@@ -125,12 +125,13 @@ export const createLecture = async (req,res) => {
         if(!lectureTitle || !courseId){
              return res.status(400).json({message:"Lecture Title required"})
         }
-        const lecture = await Lecture.create({lectureTitle})
         const course = await Course.findByPk(courseId)
-        if(course){
-            course.lectures = [...(course.lectures || []), lecture.id]
-            
+        if(!course){
+            return res.status(404).json({message:"Course not found"})
         }
+
+        const lecture = await Lecture.create({lectureTitle})
+        course.lectures = [...(course.lectures || []), lecture.id]
         await course.save()
         return res.status(201).json({lecture,course})
         
@@ -171,7 +172,7 @@ export const editLecture = async (req,res) => {
         if(lectureTitle){
             lecture.lectureTitle = lectureTitle
         }
-        lecture.isPreviewFree = isPreviewFree
+        lecture.isPreviewFree = isPreviewFree === true || isPreviewFree === "true"
         
          await lecture.save()
         return res.status(200).json(lecture)
@@ -189,8 +190,13 @@ export const removeLecture = async (req,res) => {
              return res.status(404).json({message:"Lecture not found"})
         }
         await lecture.destroy()
-        //remove the lecture from associated course
-        // Note: Need to update course.lectures array manually
+        const courses = await Course.findAll()
+        await Promise.all(courses.map(async (course) => {
+            if (!Array.isArray(course.lectures) || !course.lectures.some(id => String(id) === String(lecture.id))) return
+
+            course.lectures = course.lectures.filter(id => String(id) !== String(lecture.id))
+            await course.save()
+        }))
         return res.status(200).json({message:"Lecture Remove Successfully"})
         }
     
