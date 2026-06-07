@@ -26,7 +26,8 @@ import ViewLecture from './pages/ViewLecture'
 import SearchWithAi from './pages/SearchWithAi'
 import useAllReviews from './customHooks/getAllReviews'
 
-export const serverUrl = import.meta.env.VITE_SERVER_URL || "http://localhost:8000"
+// In development use local backend, otherwise use relative paths so Vercel routes /api/* correctly
+export const serverUrl = import.meta.env.VITE_SERVER_URL ?? (import.meta.env.DEV ? "http://localhost:8000" : "")
 
 function App() {
   
