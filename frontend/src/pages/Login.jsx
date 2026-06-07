@@ -21,20 +21,20 @@ function Login() {
     let [show,setShow] = useState(false)
      const [loading,setLoading]= useState(false)
      let dispatch = useDispatch()
-    const handleLogin = async () => {
+    const handleLogin = async (e) => {
+        if (e) e.preventDefault()
         setLoading(true)
         try {
-            const result = await axios.post(serverUrl + "/api/auth/login" , {email , password} ,{withCredentials:true})
+            const result = await axios.post(serverUrl + "/api/auth/login", { email, password }, { withCredentials: true })
             dispatch(setUserData(result.data))
             navigate("/")
-            setLoading(false)
             toast.success("Login Successfully")
         } catch (error) {
             console.log(error)
+            toast.error(error?.response?.data?.message || error.message || "Login failed")
+        } finally {
             setLoading(false)
-            toast.error(error.response.data.message)
         }
-        
     }
      const googleLogin = async () => {
             try {
@@ -60,7 +60,7 @@ function Login() {
         }
   return (
     <div className='bg-[#dddbdb] w-[100vw] h-[100vh] flex items-center justify-center flex-col gap-3'>
-            <form className='w-[90%] md:w-200 h-150 bg-[white] shadow-xl rounded-2xl flex' onSubmit={(e)=>e.preventDefault()}>
+            <form className='w-[90%] md:w-200 h-150 bg-[white] shadow-xl rounded-2xl flex' onSubmit={handleLogin}>
                 <div className='md:w-[50%] w-[100%] h-[100%] flex flex-col items-center justify-center gap-4 '>
                     <div><h1 className='font-semibold text-[black] text-2xl'>Welcome back</h1>
                     <h2 className='text-[#999797] text-[18px]'>Login to your account</h2>
@@ -80,7 +80,7 @@ function Login() {
                         {show && <MdRemoveRedEye className='absolute w-[20px] h-[20px] cursor-pointer right-[5%] bottom-[10%]' onClick={()=>setShow(prev => !prev)} />}
                     </div>
                      
-                    <button className='w-[80%] h-[40px] bg-black text-white cursor-pointer flex items-center justify-center rounded-[5px]' disabled={loading} onClick={handleLogin}>{loading?<ClipLoader size={30} color='white' /> : "Login"}</button>
+                    <button type='submit' className='w-[80%] h-[40px] bg-black text-white cursor-pointer flex items-center justify-center rounded-[5px]' disabled={loading}>{loading ? <ClipLoader size={30} color='white' /> : "Login"}</button>
                     <span className='text-[13px] cursor-pointer text-[#585757]' onClick={()=>navigate("/forgotpassword")}>Forget your password?</span>
     
                     <div className='w-[80%] flex items-center gap-2'>

@@ -23,22 +23,20 @@ function SignUp() {
     const [loading,setLoading]= useState(false)
     let dispatch = useDispatch()
 
-    const handleSignUp = async () => {
+    const handleSignUp = async (e) => {
+        if (e) e.preventDefault()
         setLoading(true)
         try {
-            const result = await axios.post(serverUrl + "/api/auth/signup" , {name , email , password , role} , {withCredentials:true} )
+            const result = await axios.post(serverUrl + "/api/auth/signup", { name, email, password, role }, { withCredentials: true })
             dispatch(setUserData(result.data))
-
             navigate("/")
             toast.success("SignUp Successfully")
-            setLoading(false)
-        } 
-        catch (error) {
+        } catch (error) {
             console.log(error)
+            toast.error(error?.response?.data?.message || error.message || "Sign up failed")
+        } finally {
             setLoading(false)
-            toast.error(error.response.data.message)
         }
-        
     }
     const googleSignUp = async () => {
         try {
@@ -63,7 +61,7 @@ function SignUp() {
     }
   return (
     <div className='bg-[#dddbdb] w-[100vw] h-[100vh] flex items-center justify-center flex-col gap-3'>
-        <form className='w-[90%] md:w-200 h-150 bg-[white] shadow-xl rounded-2xl flex' onSubmit={(e)=>e.preventDefault()}>
+        <form className='w-[90%] md:w-200 h-150 bg-[white] shadow-xl rounded-2xl flex' onSubmit={handleSignUp}>
             <div className='md:w-[50%] w-[100%] h-[100%] flex flex-col items-center justify-center gap-3 '>
                 <div><h1 className='font-semibold text-[black] text-2xl'>Let's get Started</h1>
                 <h2 className='text-[#999797] text-[18px]'>Create your account</h2>
@@ -92,7 +90,7 @@ function SignUp() {
                   <span className={`px-[10px] py-[5px] border-[1px] border-[#e7e6e6] rounded-2xl  cursor-pointer ${role === 'student' ? "border-black" : "border-[#646464]"}`} onClick={()=>setRole("student")}>Student</span>
                   <span className={`px-[10px] py-[5px] border-[1px] border-[#e7e6e6] rounded-2xl  cursor-pointer ${role === 'educator' ? "border-black" : "border-[#646464]"}`}  onClick={()=>setRole("educator")}>Educator</span>
                 </div>
-                <button className='w-[80%] h-[40px] bg-black text-white cursor-pointer flex items-center justify-center rounded-[5px]' disabled={loading} onClick={handleSignUp}>{loading?<ClipLoader size={30} color='white' /> : "Sign Up"}</button>
+                <button type='submit' className='w-[80%] h-[40px] bg-black text-white cursor-pointer flex items-center justify-center rounded-[5px]' disabled={loading}>{loading ? <ClipLoader size={30} color='white' /> : "Sign Up"}</button>
              
 
                 <div className='w-[80%] flex items-center gap-2'>
