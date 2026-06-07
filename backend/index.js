@@ -37,10 +37,14 @@ app.get("/", (req, res) => {
 
 const initApp = async () => {
     await connectDb()
-    await sequelize.sync()
+    if (process.env.NODE_ENV !== "production") {
+        await sequelize.sync()
+    }
 }
 
-initApp()
+initApp().catch((error) => {
+    console.error("App initialization failed:", error)
+})
 
 const port = process.env.PORT || 5000
 if (!process.env.VERCEL) {

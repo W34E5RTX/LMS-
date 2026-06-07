@@ -2,7 +2,12 @@ import { Sequelize } from 'sequelize';
 import dotenv from "dotenv";
 dotenv.config();
 
-const sequelize = new Sequelize(process.env.POSTGRES_URL, {
+const dbUrl = process.env.POSTGRES_URL;
+if (!dbUrl) {
+  throw new Error("Missing POSTGRES_URL environment variable.");
+}
+
+const sequelize = new Sequelize(dbUrl, {
   dialect: 'postgres',
   logging: false,
   dialectOptions: {
@@ -14,13 +19,14 @@ const sequelize = new Sequelize(process.env.POSTGRES_URL, {
 });
 
 const connectDb = async () => {
-    try {
-        await sequelize.authenticate();
-        console.log("DB connected")
-    } catch (error) {
-        console.log("DB error:", error.message)
-    }
-}
+  try {
+    await sequelize.authenticate();
+    console.log("DB connected");
+  } catch (error) {
+    console.error("DB error:", error);
+    throw error;
+  }
+};
 
 export default connectDb;
 export { sequelize };
