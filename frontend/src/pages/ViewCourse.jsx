@@ -62,16 +62,12 @@ console.log("Average Rating:", avgRating);
 
   const fetchCourseData = async () => {
     courseData.map((item) => {
-      if (item.id === courseId) {
-      dispatch(setSelectedCourseData(item))
+      if (String(item.id) === String(courseId)) {
+        dispatch(setSelectedCourseData(item))
         console.log(selectedCourseData)
-      
-
         return null;
       }
-
     })
-
   }
     const checkEnrollment = () => {
   const verify = userData?.enrolledCourses?.some(c => {

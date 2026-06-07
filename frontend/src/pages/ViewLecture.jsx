@@ -1,19 +1,39 @@
-import React, { useState } from 'react';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
+import { serverUrl } from '../App';
 import { FaPlayCircle } from 'react-icons/fa';
 import { FaArrowLeftLong } from "react-icons/fa6";
 
 function ViewLecture() {
   const { courseId } = useParams();
-  const { courseData } = useSelector((state) => state.course);
   const {userData} = useSelector((state) => state.user)
-  const selectedCourse = courseData?.find((course) => course.id === courseId);
+  const [selectedCourse, setSelectedCourse] = useState(null);
+  const [lectureList, setLectureList] = useState([]);
+  const [selectedLecture, setSelectedLecture] = useState(null);
 
-  const [selectedLecture, setSelectedLecture] = useState(
-    selectedCourse?.lectures?.[0] || null
-  );
-  const navigate = useNavigate()
+  useEffect(() => {
+    const getCourseLecture = async () => {
+      try {
+        const result = await axios.get(serverUrl + `/api/course/getcourselecture/${courseId}`, {
+          withCredentials: true,
+        });
+
+        setSelectedCourse(result.data.course);
+        setLectureList(result.data.lectures || []);
+        setSelectedLecture(result.data.lectures?.[0] || null);
+      } catch (error) {
+        console.error("Failed to load course lectures:", error);
+      }
+    };
+
+    if (courseId) {
+      getCourseLecture();
+    }
+  }, [courseId]);
+
+  const navigate = useNavigate();
   const courseCreator = userData?.id === selectedCourse?.creator ? userData : null;
 
 
@@ -51,8 +71,7 @@ function ViewLecture() {
 
         {/* Selected Lecture Info */}
         <div className="mt-2">
-          <h2 className="text-lg font-semibold text-gray-800">{selectedLecture?.lectureTitle}</h2>
-          
+          <h2 className="text-lg font-semibold text-gray-800">{selectedLecture?.lectureTitle || 'Select a lecture to watch'}</h2>
         </div>
       </div>
 
@@ -60,10 +79,10 @@ function ViewLecture() {
       <div className="w-full md:w-1/3 bg-white rounded-2xl shadow-md p-6 border border-gray-200 h-fit">
         <h2 className="text-xl font-bold mb-4 text-gray-800">All Lectures</h2>
         <div className="flex flex-col gap-3 mb-6">
-          {selectedCourse?.lectures?.length > 0 ? (
-            selectedCourse.lectures.map((lecture, index) => (
+          {lectureList.length > 0 ? (
+            lectureList.map((lecture, index) => (
               <button
-                key={index}
+                key={lecture.id || index}
                 onClick={() => setSelectedLecture(lecture)}
                 className={`flex items-center justify-between p-3 rounded-lg border transition text-left ${
                   selectedLecture?.id === lecture.id
@@ -73,7 +92,6 @@ function ViewLecture() {
               >
                 <div>
                   <h4 className="text-sm font-semibold text-gray-800">{lecture.lectureTitle}</h4>
-                  
                 </div>
                 <FaPlayCircle className="text-black text-xl" />
               </button>
