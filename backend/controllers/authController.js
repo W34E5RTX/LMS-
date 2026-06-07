@@ -13,58 +13,73 @@ const cookieOptions = {
     maxAge: 7 * 24 * 60 * 60 * 1000,
 }
 
-export const signUp=async (req,res)=>{
+export const signUp = async (req, res) => {
  
     try {
 
-        let {name,email,password,role}= req.body
-        let existUser= await User.findOne({ where: { email } })
-        if(existUser){
-            return res.status(400).json({message:"email already exist"})
+        let { name, email, password, role } = req.body
+        role = role || "student"
+
+        if (!["student", "educator"].includes(role)) {
+            return res.status(400).json({ message: "Invalid role" })
         }
-        if(!validator.isEmail(email)){
-            return res.status(400).json({message:"Please enter valid Email"})
+
+        let existUser = await User.findOne({ where: { email } })
+        if (existUser) {
+            return res.status(400).json({ message: "Email already exists" })
         }
-        if(password.length < 8){
-            return res.status(400).json({message:"Please enter a Strong Password"})
+        if (!validator.isEmail(email)) {
+            return res.status(400).json({ message: "Please enter valid Email" })
+        }
+        if (!password || password.length < 8) {
+            return res.status(400).json({ message: "Please enter a strong password" })
         }
         
-        let hashPassword = await bcrypt.hash(password,10)
+        let hashPassword = await bcrypt.hash(password, 10)
         let user = await User.create({
-            name ,
-            email ,
-            password:hashPassword ,
+            name,
+            email,
+            password: hashPassword,
             role,
-           
-            })
+        })
+
         let token = await genToken(user.id)
         res.cookie("token", token, cookieOptions)
-        return res.status(201).json(user)
+
+        const userResponse = user.toJSON()
+        delete userResponse.password
+        return res.status(201).json(userResponse)
 
     } catch (error) {
-        console.log("signUp error")
-        return res.status(500).json({message:`signUp Error ${error}`})
+        console.log("signUp error", error)
+        return res.status(500).json({ message: `signUp Error ${error.message || error}` })
     }
 }
 
-export const login=async(req,res)=>{
+export const login = async (req, res) => {
     try {
-        let {email,password}= req.body
-        let user= await User.findOne({ where: { email } })
-        if(!user){
-            return res.status(400).json({message:"user does not exist"})
+        let { email, password } = req.body
+        let user = await User.findOne({ where: { email } })
+        if (!user) {
+            return res.status(400).json({ message: "User does not exist" })
         }
-        let isMatch =await bcrypt.compare(password, user.password)
-        if(!isMatch){
-            return res.status(400).json({message:"incorrect Password"})
+        if (!user.password) {
+            return res.status(400).json({ message: "Please login with Google" })
+        }
+        let isMatch = await bcrypt.compare(password, user.password)
+        if (!isMatch) {
+            return res.status(400).json({ message: "Incorrect password" })
         }
         let token = await genToken(user.id)
         res.cookie("token", token, cookieOptions)
-        return res.status(200).json(user)
+
+        const userResponse = user.toJSON()
+        delete userResponse.password
+        return res.status(200).json(userResponse)
 
     } catch (error) {
-        console.log("login error")
-        return res.status(500).json({message:`login Error ${error}`})
+        console.log("login error", error)
+        return res.status(500).json({ message: `login Error ${error.message || error}` })
     }
 }
 
@@ -73,7 +88,7 @@ export const login=async(req,res)=>{
 
 export const logOut = async(req,res)=>{
     try {
-        await res.clearCookie("token")
+        res.clearCookie("token", cookieOptions)
         return res.status(200).json({message:"logOut Successfully"})
     } catch (error) {
         return res.status(500).json({message:`logout Error ${error}`})
@@ -81,23 +96,29 @@ export const logOut = async(req,res)=>{
 }
 
 
-export const googleSignup = async (req,res) => {
+export const googleSignup = async (req, res) => {
     try {
-        const {name , email , role} = req.body
-        let user= await User.findOne({ where: { email } })
-        if(!user){
+        const { name, email, role } = req.body
+        const normalizedRole = ["educator", "student"].includes(role) ? role : "student"
+
+        let user = await User.findOne({ where: { email } })
+        if (!user) {
             user = await User.create({
-            name , email ,role
-        })
+                name,
+                email,
+                role: normalizedRole,
+            })
         }
         let token = await genToken(user.id)
         res.cookie("token", token, cookieOptions)
-        return res.status(200).json(user)
 
+        const userResponse = user.toJSON()
+        delete userResponse.password
+        return res.status(200).json(userResponse)
 
     } catch (error) {
         console.log(error)
-         return res.status(500).json({message:`googleSignup  ${error}`})
+        return res.status(500).json({ message: `googleSignup  ${error.message || error}` })
     }
     
 }

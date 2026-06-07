@@ -16,13 +16,13 @@ import reviewRouter from "./routes/reviewRoute.js"
 // import './models/reviewModel.js'
 dotenv.config()
 
-let port = process.env.PORT
-let app = express() 
+const app = express()
+app.set('trust proxy', 1)
 app.use(express.json())
 app.use(cookieParser())
 app.use(cors({
-    origin:true,
-    credentials:true
+    origin: true,
+    credentials: true,
 }))
 app.use("/api/auth", authRouter)
 app.use("/api/user", userRouter)
@@ -31,14 +31,23 @@ app.use("/api/payment", paymentRouter)
 app.use("/api/ai", aiRouter)
 app.use("/api/review", reviewRouter)
 
-
-app.get("/" , (req,res)=>{
+app.get("/", (req, res) => {
     res.send("Hello From Server")
 })
 
-app.listen(port , async ()=>{
-    console.log("Server Started")
+const initApp = async () => {
     await connectDb()
     await sequelize.sync()
-})
+}
+
+initApp()
+
+const port = process.env.PORT || 5000
+if (!process.env.VERCEL) {
+    app.listen(port, () => {
+        console.log(`Server started on port ${port}`)
+    })
+}
+
+export default app
 
